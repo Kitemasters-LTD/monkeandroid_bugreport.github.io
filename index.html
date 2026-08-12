@@ -94,6 +94,8 @@
   .status-Open{background:var(--ink); color:#fff;}
   .status-In-Progress{background:var(--amber); color:#1C1E21;}
   .status-Resolved{background:var(--green); color:#fff;}
+  .delete-btn{font-family:'Inter',sans-serif; font-size:11px; font-weight:700; padding:4px 9px; border-radius:20px; border:1.5px solid var(--red); background:none; color:var(--red); cursor:pointer; transition:all .15s ease;}
+  .delete-btn:hover{background:var(--red); color:#fff;}
 
   .corner-stamp{position:absolute; top:14px; right:-30px; width:110px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:9.5px; font-weight:700; letter-spacing:0.05em; padding:3px 0; transform:rotate(40deg); text-transform:uppercase;}
   .corner-stamp.crit{background:var(--red); color:#fff;}
@@ -121,6 +123,15 @@
 
   .readonly-note{font-size:12.5px; color:var(--text-dim); margin-bottom:18px;}
 
+  /* ---- Toast ---- */
+  #toast{
+    position:fixed; top:-80px; left:50%; transform:translateX(-50%);
+    background:var(--red); color:#fff; font-family:'Inter',sans-serif; font-weight:600; font-size:14px;
+    padding:13px 22px; border-radius:10px; box-shadow:0 12px 40px rgba(0,0,0,0.4);
+    z-index:9999; max-width:90vw; text-align:center; transition:top .35s cubic-bezier(.2,.8,.2,1);
+  }
+  #toast.show{top:24px;}
+
   @media (max-width:640px){
     .row2{grid-template-columns:1fr;}
     .severity-picker{grid-template-columns:repeat(2,1fr);}
@@ -130,6 +141,7 @@
 </style>
 </head>
 <body>
+<div id="toast"></div>
 <div class="app">
   <div class="topbar">
     <div class="brand">
@@ -469,6 +481,16 @@ async function cycleStatus(rowId, current){
 }
 window.cycleStatus = cycleStatus;
 
+async function deleteBug(rowId, label){
+  if(!canEdit()) return;
+  if(!confirm('Delete report ' + label + '? This cannot be undone.')) return;
+  const { error } = await sb.from('bugs').delete().eq('id', rowId);
+  if(error){ alert('Could not delete report:\n\n' + (error.message||'')); console.error(error); return; }
+  showToast('Report ' + label + ' deleted.');
+  renderBoard();
+}
+window.deleteBug = deleteBug;
+
 async function renderBoard(){
   const { data, error } = await sb.from('bugs').select('*').order('created_at', { ascending:false });
   if(error){
@@ -513,13 +535,17 @@ async function renderBoard(){
       ? '<button class="status-pill editable ' + statusClass + '" onclick="cycleStatus(\'' + b.id + '\',\'' + b.status + '\')">' + b.status + '</button>'
       : '<span class="status-pill ' + statusClass + '">' + b.status + '</span>';
 
+    const deleteControl = editable
+      ? '<button class="delete-btn" onclick="deleteBug(\'' + b.id + '\',\'' + escapeHtml(b.bug_id) + '\')">Delete</button>'
+      : '';
+
     return '<div class="ticket">' + critStamp +
       '<span class="ticket-id">' + escapeHtml(b.bug_id) + ' \u00b7 ' + timeAgo(b.created_at) + '</span>' +
       '<h4>' + escapeHtml(b.summary || 'Untitled') + '</h4>' +
       '<div class="desc">' + escapeHtml(b.description || 'No description provided.') + '</div>' +
       '<div class="ticket-tags">' + (b.area ? '<span class="tag tag-area">' + escapeHtml(b.area) + '</span>' : '') + '</div>' +
       '<div class="ticket-footer"><span>' + escapeHtml(b.reporter || 'anonymous') + '</span>' +
-      sevControl + statusControl + '</div></div>';
+      sevControl + statusControl + deleteControl + '</div></div>';
   }).join('');
 }
 
@@ -529,7 +555,39 @@ function escapeHtml(str){
   return div.innerHTML;
 }
 
+// ---------- toast ----------
+let toastTimer = null;
+function showToast(message){
+  const el = document.getElementById('toast');
+  el.textContent = message;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ el.classList.remove('show'); }, 5000);
+}
+
+// After a rejected sign-in, Supabase redirects back with an error in the URL
+// hash or query string. Catch it and show the red toast.
+function checkForAuthError(){
+  const params = new URLSearchParams(
+    window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.search.slice(1)
+  );
+  const err = params.get('error') || params.get('error_code');
+  const desc = params.get('error_description');
+  if(err || desc){
+    let msg = desc ? decodeURIComponent(desc.replace(/\+/g, ' ')) : 'Sign-in failed.';
+    // The hook rejects non-admin Google accounts with an "authorized" message —
+    // show a clear admin-specific line for that case.
+    if(/not authorized|unauthorized|admin/i.test(msg)){
+      msg = 'You are not an admin.';
+    }
+    showToast(msg);
+    // clean the URL so the error doesn't persist on refresh
+    history.replaceState(null, '', window.location.pathname);
+  }
+}
+
 loadSession();
+checkForAuthError();
 </script>
 </body>
 </html>
