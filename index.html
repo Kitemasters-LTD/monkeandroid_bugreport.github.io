@@ -10,7 +10,7 @@
 <style>
   :root{
     --ink:#1C1E21; --ink-soft:#2A2D31; --paper:#F7F5F0; --paper-dim:#EDEAE2;
-    --amber:#E8A23D; --green:#4A7C59; --red:#C1443C;
+    --amber:#E8A23D; --green:#4A7C59; --red:#C1443C; --discord:#5865F2;
     --line:rgba(255,255,255,0.09); --line-soft:rgba(28,30,33,0.1); --text-dim:#9A9994;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -43,6 +43,7 @@
   .field .hint{font-size:12.5px; color:#6b6a66; font-weight:400; text-transform:none; letter-spacing:0; display:block; margin-top:4px;}
   .field input[type=text], .field textarea{width:100%; font-family:'Inter',sans-serif; font-size:14.5px; color:var(--ink); background:#fff; border:1.5px solid var(--line-soft); border-radius:9px; padding:11px 13px; outline:none; transition:border-color .15s ease;}
   .field input:focus, .field textarea:focus{border-color:var(--ink);}
+  .field input[readonly]{background:#EFEDE6; color:#57564f; cursor:default;}
   .field textarea{resize:vertical; min-height:70px; line-height:1.5; font-family:'Inter',sans-serif;}
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
 
@@ -64,7 +65,7 @@
   .success-card button{font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px; background:none; border:1.5px solid var(--ink); color:var(--ink); padding:10px 20px; border-radius:8px; cursor:pointer;}
   .success-card button:hover{background:var(--ink); color:var(--paper);}
 
-  .board-header{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:24px; flex-wrap:wrap; gap:14px;}
+  .board-header{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:18px; flex-wrap:wrap; gap:14px;}
   .board-header h2{font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:700;}
   .board-stats{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
   .stat-chip{font-family:'JetBrains Mono',monospace; font-size:11.5px; font-weight:600; background:var(--ink-soft); border:1px solid var(--line); padding:6px 11px; border-radius:20px; color:var(--text-dim);}
@@ -88,7 +89,8 @@
   .tag-area{background:#EDEAE2; color:#57564f;}
   .ticket-footer{display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:11.5px; color:#8a8983; border-top:1px solid #E5E2D9; padding-top:12px; flex-wrap:wrap;}
   select.sev-select{font-family:'Inter',sans-serif; font-size:11px; font-weight:700; border-radius:20px; border:1.5px solid var(--line-soft); padding:4px 8px; background:#fff; color:var(--ink); cursor:pointer;}
-  .status-pill{font-family:'Inter',sans-serif; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; border:none; cursor:pointer;}
+  .status-pill{font-family:'Inter',sans-serif; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px; border:none;}
+  .status-pill.editable{cursor:pointer;}
   .status-Open{background:var(--ink); color:#fff;}
   .status-In-Progress{background:var(--amber); color:#1C1E21;}
   .status-Resolved{background:var(--green); color:#fff;}
@@ -100,18 +102,24 @@
   .empty-state .glyph{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--amber); margin-bottom:10px; display:block;}
   .empty-state p{font-size:14px;}
 
-  /* ---- Admin gate ---- */
-  .gate{max-width:420px; margin:60px auto; text-align:center;}
+  .gate{max-width:440px; margin:40px auto; text-align:center;}
   .gate .card{padding:40px 32px;}
   .gate h3{font-family:'Space Grotesk',sans-serif; font-size:20px; margin-bottom:8px;}
-  .gate p{color:#6b6a66; font-size:14px; margin-bottom:24px;}
-  .google-btn{display:inline-flex; align-items:center; gap:10px; font-family:'Inter',sans-serif; font-weight:600; font-size:14px; background:#fff; color:var(--ink); border:1.5px solid var(--line-soft); padding:11px 20px; border-radius:9px; cursor:pointer;}
-  .google-btn:hover{border-color:var(--ink);}
-  .denied{color:var(--red); font-size:13px; margin-top:14px;}
-  .admin-bar{display:flex; align-items:center; gap:10px;}
-  .admin-email{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim);}
+  .gate p{color:#6b6a66; font-size:14px; margin-bottom:24px; line-height:1.55;}
+  .oauth-btn{display:inline-flex; align-items:center; justify-content:center; gap:10px; width:100%; font-family:'Inter',sans-serif; font-weight:600; font-size:14.5px; padding:12px 20px; border-radius:9px; cursor:pointer; border:1.5px solid transparent;}
+  .oauth-btn.discord{background:var(--discord); color:#fff;}
+  .oauth-btn.discord:hover{filter:brightness(1.08);}
+  .oauth-btn.google{background:#fff; color:var(--ink); border-color:var(--line-soft);}
+  .oauth-btn.google:hover{border-color:var(--ink);}
+
+  .session-bar{display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--ink-soft); border:1px solid var(--line); border-radius:10px; padding:10px 14px; margin-bottom:20px; flex-wrap:wrap;}
+  .session-who{display:flex; align-items:center; gap:9px; font-size:13px; color:var(--paper);}
+  .session-who img{width:24px; height:24px; border-radius:50%;}
+  .session-who .provider-tag{font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em;}
   .signout-btn{font-family:'Inter',sans-serif; font-size:11.5px; font-weight:600; color:var(--text-dim); background:none; border:1px solid var(--line); padding:5px 11px; border-radius:20px; cursor:pointer;}
   .signout-btn:hover{color:var(--paper); border-color:var(--paper);}
+
+  .readonly-note{font-size:12.5px; color:var(--text-dim); margin-bottom:18px;}
 
   @media (max-width:640px){
     .row2{grid-template-columns:1fr;}
@@ -125,7 +133,7 @@
 <div class="app">
   <div class="topbar">
     <div class="brand">
-      <span class="brand-mark">◆ BUGS</span>
+      <span class="brand-mark">&#9670; BUGS</span>
       <h1>Field Reports</h1>
     </div>
     <div class="nav-tabs">
@@ -143,90 +151,115 @@
         <p>Tell us exactly what happened and how to see it again. The more precise the report, the faster it gets fixed.</p>
       </div>
 
-      <form class="card" id="bugForm">
-        <div class="field">
-          <label for="reporter">Your name or email</label>
-          <input type="text" id="reporter" placeholder="jane@company.com" required>
+      <!-- Discord gate for reporters -->
+      <div id="formGate" style="display:none;">
+        <div class="card" style="text-align:center; padding:40px 32px;">
+          <h3 style="font-family:'Space Grotesk',sans-serif; font-size:20px; margin-bottom:8px;">Sign in to report a bug</h3>
+          <p style="color:#6b6a66; font-size:14px; margin-bottom:24px; line-height:1.55;">Connect your Discord account so we know who filed the report and can follow up with you.</p>
+          <button class="oauth-btn discord" id="discordSignIn">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.369a19.79 19.79 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028 14.09 14.09 0 001.226-1.994.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.009c.12.099.246.198.373.292a.077.077 0 01-.006.127c-.598.35-1.22.645-1.873.891a.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.029 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.056c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.028zM8.02 15.331c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.096 2.157 2.42 0 1.332-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.086-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.211 0 2.176 1.096 2.157 2.42 0 1.332-.946 2.418-2.157 2.418z"/></svg>
+            Sign in with Discord
+          </button>
         </div>
-        <div class="field">
-          <label for="summary">Summary</label>
-          <input type="text" id="summary" placeholder="Login button unresponsive on mobile" required>
-        </div>
-        <div class="field">
-          <label for="description">What went wrong</label>
-          <textarea id="description" placeholder="Describe what happened in your own words." required></textarea>
-        </div>
-        <div class="field">
-          <label for="steps">Steps to reproduce</label>
-          <textarea id="steps" placeholder="1. Open the app&#10;2. Tap Log In&#10;3. Nothing happens" required></textarea>
-          <span class="hint">Numbered steps help us see the bug ourselves.</span>
-        </div>
-        <div class="row2">
-          <div class="field">
-            <label for="expected">Expected result</label>
-            <textarea id="expected" placeholder="What should have happened"></textarea>
+      </div>
+
+      <!-- Actual form, shown once signed in -->
+      <div id="formSignedIn" style="display:none;">
+        <div class="session-bar">
+          <div class="session-who">
+            <img id="formAvatar" alt="" style="display:none;">
+            <span id="formWho"></span>
+            <span class="provider-tag" id="formProvider"></span>
           </div>
-          <div class="field">
-            <label for="actual">Actual result</label>
-            <textarea id="actual" placeholder="What actually happened"></textarea>
-          </div>
+          <button class="signout-btn" id="formSignOut">Sign out</button>
         </div>
-        <div class="field">
-          <label>Severity</label>
-          <div class="severity-picker" id="sevPicker">
-            <button type="button" class="sev-btn" data-sev="Low">Low</button>
-            <button type="button" class="sev-btn selected" data-sev="Medium">Medium</button>
-            <button type="button" class="sev-btn" data-sev="High">High</button>
-            <button type="button" class="sev-btn" data-sev="Critical">Critical</button>
-          </div>
-          <span class="hint">This is your suggested severity — the reviewer may adjust it.</span>
-        </div>
-        <div class="row2">
+
+        <form class="card" id="bugForm">
           <div class="field">
-            <label for="area">Area / feature</label>
-            <input type="text" id="area" placeholder="Checkout, Login, Search…">
+            <label for="reporter">Reporting as</label>
+            <input type="text" id="reporter" readonly>
+            <span class="hint">Taken from your signed-in account.</span>
           </div>
           <div class="field">
-            <label for="device">Browser / device</label>
-            <input type="text" id="device" placeholder="Chrome 126 / Windows 11">
+            <label for="summary">Summary</label>
+            <input type="text" id="summary" placeholder="Login button unresponsive on mobile" required>
           </div>
-        </div>
-        <div class="field">
-          <label for="link">Screenshot or recording link <span class="hint" style="display:inline; text-transform:none; font-weight:400;">(optional)</span></label>
-          <input type="text" id="link" placeholder="https://…">
-        </div>
-        <button type="submit" class="submit-btn" id="submitBtn">Submit report</button>
-      </form>
+          <div class="field">
+            <label for="description">What went wrong</label>
+            <textarea id="description" placeholder="Describe what happened in your own words." required></textarea>
+          </div>
+          <div class="field">
+            <label for="steps">Steps to reproduce</label>
+            <textarea id="steps" placeholder="1. Open the app&#10;2. Tap Log In&#10;3. Nothing happens" required></textarea>
+            <span class="hint">Numbered steps help us see the bug ourselves.</span>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="expected">Expected result</label>
+              <textarea id="expected" placeholder="What should have happened"></textarea>
+            </div>
+            <div class="field">
+              <label for="actual">Actual result</label>
+              <textarea id="actual" placeholder="What actually happened"></textarea>
+            </div>
+          </div>
+          <div class="field">
+            <label>Severity</label>
+            <div class="severity-picker" id="sevPicker">
+              <button type="button" class="sev-btn" data-sev="Low">Low</button>
+              <button type="button" class="sev-btn selected" data-sev="Medium">Medium</button>
+              <button type="button" class="sev-btn" data-sev="High">High</button>
+              <button type="button" class="sev-btn" data-sev="Critical">Critical</button>
+            </div>
+            <span class="hint">This is your suggested severity &mdash; the reviewer may adjust it.</span>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="area">Area / feature</label>
+              <input type="text" id="area" placeholder="Checkout, Login, Search&hellip;">
+            </div>
+            <div class="field">
+              <label for="device">Browser / device</label>
+              <input type="text" id="device" placeholder="Chrome 126 / Windows 11">
+            </div>
+          </div>
+          <div class="field">
+            <label for="link">Screenshot or recording link <span class="hint" style="display:inline; text-transform:none; font-weight:400;">(optional)</span></label>
+            <input type="text" id="link" placeholder="https://&hellip;">
+          </div>
+          <button type="submit" class="submit-btn" id="submitBtn">Submit report</button>
+        </form>
+      </div>
     </div>
   </div>
 
   <!-- ============ BOARD VIEW ============ -->
   <div class="view" id="view-board">
-    <!-- Signed-out gate -->
-    <div class="gate" id="gate">
+    <div id="boardGate" class="gate" style="display:none;">
       <div class="card">
         <h3>Reviewer sign-in</h3>
-        <p>This board is restricted. Sign in with the admin Google account to view and manage reports.</p>
-        <button class="google-btn" id="googleSignIn">
+        <p>Sign in with the admin Google account to manage reports. Reporters signed in with Discord can view the board read-only.</p>
+        <button class="oauth-btn google" id="googleSignIn">
           <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.13-.85 2.09-1.8 2.73v2.27h2.92c1.7-1.57 2.68-3.88 2.68-6.64z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.27c-.81.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.34C2.44 15.98 5.48 18 9 18z"/><path fill="#FBBC05" d="M3.97 10.71A5.4 5.4 0 013.68 9c0-.59.1-1.17.29-1.71V4.95H.96A8.99 8.99 0 000 9c0 1.45.35 2.83.96 4.05l3.01-2.34z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.59-2.59C13.46.89 11.43 0 9 0 5.48 0 2.44 2.02.96 4.95l3.01 2.34C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
           Sign in with Google
         </button>
-        <div id="deniedMsg" style="display:none;" class="denied">That account isn't authorized to view this board.</div>
       </div>
     </div>
 
-    <!-- Signed-in board -->
     <div id="boardContent" style="display:none;">
+      <div class="session-bar">
+        <div class="session-who">
+          <img id="boardAvatar" alt="" style="display:none;">
+          <span id="boardWho"></span>
+          <span class="provider-tag" id="boardProvider"></span>
+        </div>
+        <button class="signout-btn" id="boardSignOut">Sign out</button>
+      </div>
       <div class="board-header">
         <h2>Review Board</h2>
-        <div class="board-stats">
-          <div class="admin-bar">
-            <span class="admin-email" id="adminEmail"></span>
-            <button class="signout-btn" id="signOutBtn">Sign out</button>
-          </div>
-        </div>
+        <div class="board-stats" id="boardStats"></div>
       </div>
-      <div class="board-stats" id="boardStats" style="margin-bottom:18px;"></div>
+      <div class="readonly-note" id="readonlyNote" style="display:none;">You're viewing read-only. Only the reviewer can change severity or status.</div>
       <div class="filter-row" id="filterRow">
         <button class="filter-chip active" data-filter="All">All</button>
         <button class="filter-chip" data-filter="Open">Open</button>
@@ -239,19 +272,36 @@
 </div>
 
 <script>
-// ====== CONFIG — fill these in from your Supabase project settings ======
+// ====== CONFIG ======
 const SUPABASE_URL = 'https://uoiyzbcsrdsniysovixf.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_mUk967AJmmBthUm08TC6Kw_JAu7Gmzo';
-// Admin authorization is enforced entirely by the Supabase RLS policy on the
-// "bugs" table — no admin email is stored in this file.
-// ==========================================================================
+// Admin authorization lives in the Supabase RLS policy, not in this file.
+// Discord = reporter (can submit). Google = reviewer (can edit).
+// ====================
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let bugs = [];
 let currentFilter = 'All';
 let selectedSeverity = 'Medium';
-let currentUser = null;
+let session = null;
+
+function providerOf(user){
+  return (user && user.app_metadata && user.app_metadata.provider) || '';
+}
+function displayNameOf(user){
+  const m = (user && user.user_metadata) || {};
+  return m.full_name || m.name || m.user_name || m.preferred_username || user.email || 'Signed in';
+}
+function avatarOf(user){
+  const m = (user && user.user_metadata) || {};
+  return m.avatar_url || m.picture || '';
+}
+// Reviewer privileges are surfaced for Google sign-ins; the database policy is
+// what actually enforces who may edit.
+function canEdit(){
+  return session && providerOf(session.user) === 'google';
+}
 
 // ---------- nav ----------
 document.querySelectorAll('.nav-tab').forEach(tab=>{
@@ -260,11 +310,11 @@ document.querySelectorAll('.nav-tab').forEach(tab=>{
     tab.classList.add('active');
     document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     document.getElementById('view-' + tab.dataset.view).classList.add('active');
-    if(tab.dataset.view === 'board') checkAuthAndRender();
+    refreshAuthUI();
   });
 });
 
-// ---------- severity picker (submit form) ----------
+// ---------- severity picker ----------
 document.querySelectorAll('#sevPicker .sev-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('#sevPicker .sev-btn').forEach(b=>b.classList.remove('selected'));
@@ -273,19 +323,76 @@ document.querySelectorAll('#sevPicker .sev-btn').forEach(btn=>{
   });
 });
 
-// ---------- form submit (public, insert-only) ----------
-const form = document.getElementById('bugForm');
-const formWrap = document.querySelector('.form-wrap');
-form.addEventListener('submit', async (e)=>{
+// ---------- auth actions ----------
+document.getElementById('discordSignIn').addEventListener('click', async ()=>{
+  await sb.auth.signInWithOAuth({ provider:'discord', options:{ redirectTo: window.location.href.split('#')[0] } });
+});
+document.getElementById('googleSignIn').addEventListener('click', async ()=>{
+  await sb.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: window.location.href.split('#')[0] } });
+});
+async function doSignOut(){
+  await sb.auth.signOut();
+  session = null;
+  refreshAuthUI();
+}
+document.getElementById('formSignOut').addEventListener('click', doSignOut);
+document.getElementById('boardSignOut').addEventListener('click', doSignOut);
+
+// ---------- auth UI ----------
+function refreshAuthUI(){
+  const signedIn = !!session;
+  const user = signedIn ? session.user : null;
+
+  // form view
+  document.getElementById('formGate').style.display = signedIn ? 'none' : 'block';
+  document.getElementById('formSignedIn').style.display = signedIn ? 'block' : 'none';
+  if(signedIn){
+    const name = displayNameOf(user);
+    document.getElementById('formWho').textContent = name;
+    document.getElementById('formProvider').textContent = providerOf(user);
+    const av = avatarOf(user);
+    const avEl = document.getElementById('formAvatar');
+    if(av){ avEl.src = av; avEl.style.display = 'block'; } else { avEl.style.display = 'none'; }
+    const rep = document.getElementById('reporter');
+    if(rep) rep.value = name;
+  }
+
+  // board view
+  document.getElementById('boardGate').style.display = signedIn ? 'none' : 'block';
+  document.getElementById('boardContent').style.display = signedIn ? 'block' : 'none';
+  if(signedIn){
+    document.getElementById('boardWho').textContent = displayNameOf(user);
+    document.getElementById('boardProvider').textContent = providerOf(user);
+    const av = avatarOf(user);
+    const avEl = document.getElementById('boardAvatar');
+    if(av){ avEl.src = av; avEl.style.display = 'block'; } else { avEl.style.display = 'none'; }
+    document.getElementById('readonlyNote').style.display = canEdit() ? 'none' : 'block';
+    if(document.getElementById('view-board').classList.contains('active')) renderBoard();
+  }
+}
+
+async function loadSession(){
+  const { data } = await sb.auth.getSession();
+  session = data.session || null;
+  refreshAuthUI();
+}
+sb.auth.onAuthStateChange((_e, s)=>{ session = s; refreshAuthUI(); });
+
+// ---------- submit ----------
+document.getElementById('bugForm').addEventListener('submit', async (e)=>{
   e.preventDefault();
+  if(!session){ alert('Please sign in with Discord first.'); return; }
+
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.textContent = 'Submitting…';
+  btn.textContent = 'Submitting\u2026';
 
   const id = 'BUG-' + String(Date.now()).slice(-6);
   const bug = {
     bug_id: id,
-    reporter: document.getElementById('reporter').value.trim(),
+    reporter: displayNameOf(session.user),
+    reporter_provider: providerOf(session.user),
+    reporter_uid: session.user.id,
     summary: document.getElementById('summary').value.trim(),
     description: document.getElementById('description').value.trim(),
     steps: document.getElementById('steps').value.trim(),
@@ -299,70 +406,22 @@ form.addEventListener('submit', async (e)=>{
   };
 
   const { error } = await sb.from('bugs').insert(bug);
-
   if(error){
     btn.disabled = false;
     btn.textContent = 'Submit report';
-    alert('Something went wrong submitting your report. Please try again.');
-    console.error(error);
+    alert('Could not submit report:\n\n' + (error.message || 'Unknown error') + (error.hint ? '\n\nHint: ' + error.hint : ''));
+    console.error('Supabase insert error:', error);
     return;
   }
 
-  formWrap.innerHTML = `
-    <div class="success-card">
-      <span class="success-stamp">${id} · LOGGED</span>
-      <h3>Report received</h3>
-      <p>Thanks — this has been added to the review board. We'll take it from here.</p>
-      <button id="newReportBtn">Submit another</button>
-    </div>
-  `;
+  document.querySelector('.form-wrap').innerHTML =
+    '<div class="success-card">' +
+    '<span class="success-stamp">' + id + ' \u00b7 LOGGED</span>' +
+    '<h3>Report received</h3>' +
+    '<p>Thanks &mdash; this has been added to the review board. We\'ll take it from here.</p>' +
+    '<button id="newReportBtn">Submit another</button>' +
+    '</div>';
   document.getElementById('newReportBtn').addEventListener('click', ()=>{ location.reload(); });
-});
-
-// ---------- auth ----------
-document.getElementById('googleSignIn').addEventListener('click', async ()=>{
-  await sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.href }
-  });
-});
-
-document.getElementById('signOutBtn').addEventListener('click', async ()=>{
-  await sb.auth.signOut();
-  currentUser = null;
-  showGate();
-});
-
-function showGate(deniedReason){
-  document.getElementById('gate').style.display = 'block';
-  document.getElementById('boardContent').style.display = 'none';
-  document.getElementById('deniedMsg').style.display = deniedReason ? 'block' : 'none';
-}
-
-function showBoard(user){
-  document.getElementById('gate').style.display = 'none';
-  document.getElementById('boardContent').style.display = 'block';
-  document.getElementById('adminEmail').textContent = 'Signed in';
-  renderBoard();
-}
-
-async function checkAuthAndRender(){
-  const { data: { session } } = await sb.auth.getSession();
-  if(session && session.user){
-    currentUser = session.user;
-    // Don't gate on email client-side — the Supabase RLS policy is the real
-    // authorization check. If this account isn't the admin, renderBoard()'s
-    // select/update calls will simply return no rows or fail silently.
-    showBoard(currentUser);
-  } else {
-    showGate();
-  }
-}
-
-sb.auth.onAuthStateChange((event, session) => {
-  if(document.getElementById('view-board').classList.contains('active')){
-    checkAuthAndRender();
-  }
 });
 
 // ---------- board ----------
@@ -386,17 +445,18 @@ function timeAgo(iso){
 }
 
 async function updateSeverity(rowId, newSev){
-  const { error } = await sb.from('bugs').update({ severity: newSev }).eq('id', rowId);
-  if(error){ alert('Could not update severity.'); console.error(error); return; }
+  const { error } = await sb.from('bugs').update({ severity:newSev }).eq('id', rowId);
+  if(error){ alert('Could not update severity:\n\n' + (error.message||'')); console.error(error); }
   renderBoard();
 }
 window.updateSeverity = updateSeverity;
 
 async function cycleStatus(rowId, current){
+  if(!canEdit()) return;
   const order = ['Open','In Progress','Resolved'];
   const next = order[(order.indexOf(current)+1) % order.length];
-  const { error } = await sb.from('bugs').update({ status: next }).eq('id', rowId);
-  if(error){ alert('Could not update status.'); console.error(error); return; }
+  const { error } = await sb.from('bugs').update({ status:next }).eq('id', rowId);
+  if(error){ alert('Could not update status:\n\n' + (error.message||'')); console.error(error); }
   renderBoard();
 }
 window.cycleStatus = cycleStatus;
@@ -404,77 +464,64 @@ window.cycleStatus = cycleStatus;
 async function renderBoard(){
   const { data, error } = await sb.from('bugs').select('*').order('created_at', { ascending:false });
   if(error){
-    document.getElementById('boardGrid').innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><p>Could not load reports. ${error.message||''}</p></div>`;
+    document.getElementById('boardGrid').innerHTML =
+      '<div class="empty-state" style="grid-column:1/-1;"><p>Could not load reports. ' + (error.message||'') + '</p></div>';
     return;
   }
   bugs = data || [];
 
+  const counts = {Open:0,'In Progress':0,Resolved:0};
+  bugs.forEach(b=>{ if(counts[b.status]!==undefined) counts[b.status]++; });
+  document.getElementById('boardStats').innerHTML =
+    '<span class="stat-chip"><b>' + bugs.length + '</b> total</span>' +
+    '<span class="stat-chip"><b>' + counts.Open + '</b> open</span>' +
+    '<span class="stat-chip"><b>' + counts['In Progress'] + '</b> in progress</span>' +
+    '<span class="stat-chip"><b>' + counts.Resolved + '</b> resolved</span>';
+
+  const filtered = currentFilter==='All' ? bugs : bugs.filter(b=>b.status===currentFilter);
   const grid = document.getElementById('boardGrid');
-  const statsEl = document.getElementById('boardStats');
 
-  const counts = {Open:0, 'In Progress':0, Resolved:0};
-  bugs.forEach(b=>{ if(counts[b.status] !== undefined) counts[b.status]++; });
-  statsEl.innerHTML = `
-    <span class="stat-chip"><b>${bugs.length}</b> total</span>
-    <span class="stat-chip"><b>${counts.Open}</b> open</span>
-    <span class="stat-chip"><b>${counts['In Progress']}</b> in progress</span>
-    <span class="stat-chip"><b>${counts.Resolved}</b> resolved</span>
-  `;
-
-  const filtered = currentFilter === 'All' ? bugs : bugs.filter(b=>b.status===currentFilter);
-
-  if(filtered.length === 0){
-    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-      <span class="glyph">⌁ NO SPECIMENS</span>
-      <p>${bugs.length === 0 ? 'No bugs reported yet.' : 'Nothing matches this filter.'}</p>
-    </div>`;
+  if(filtered.length===0){
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">' +
+      '<span class="glyph">\u2301 NO SPECIMENS</span><p>' +
+      (bugs.length===0 ? 'No bugs reported yet.' : 'Nothing matches this filter.') + '</p></div>';
     return;
   }
 
-  grid.innerHTML = filtered.map(b=>{
-    const statusClass = 'status-' + b.status.replace(' ','-');
-    const critStamp = b.severity === 'Critical' ? '<div class="corner-stamp crit">Critical</div>' : '';
-    return `
-      <div class="ticket">
-        ${critStamp}
-        <span class="ticket-id">${b.bug_id} · ${timeAgo(b.created_at)}</span>
-        <h4>${escapeHtml(b.summary || 'Untitled')}</h4>
-        <div class="desc">${escapeHtml(b.description || 'No description provided.')}</div>
-        <div class="ticket-tags">
-          ${b.area ? `<span class="tag tag-area">${escapeHtml(b.area)}</span>` : ''}
-        </div>
-        <div class="ticket-footer">
-          <span>${escapeHtml(b.reporter || 'anonymous')}</span>
-          <select class="sev-select" onchange="updateSeverity('${b.id}', this.value)">
-            <option value="Low" ${b.severity==='Low'?'selected':''}>Low</option>
-            <option value="Medium" ${b.severity==='Medium'?'selected':''}>Medium</option>
-            <option value="High" ${b.severity==='High'?'selected':''}>High</option>
-            <option value="Critical" ${b.severity==='Critical'?'selected':''}>Critical</option>
-          </select>
-          <button class="status-pill ${statusClass}" onclick="cycleStatus('${b.id}','${b.status}')">${b.status}</button>
-        </div>
-      </div>
-    `;
+  const editable = canEdit();
+
+  grid.innerHTML = filtered.map(function(b){
+    const statusClass = 'status-' + String(b.status).replace(' ','-');
+    const critStamp = b.severity==='Critical' ? '<div class="corner-stamp crit">Critical</div>' : '';
+
+    const sevControl = editable
+      ? '<select class="sev-select" onchange="updateSeverity(\'' + b.id + '\', this.value)">' +
+        ['Low','Medium','High','Critical'].map(function(s){
+          return '<option value="' + s + '"' + (b.severity===s?' selected':'') + '>' + s + '</option>';
+        }).join('') + '</select>'
+      : '<span class="tag tag-sev-' + b.severity + '">' + b.severity + '</span>';
+
+    const statusControl = editable
+      ? '<button class="status-pill editable ' + statusClass + '" onclick="cycleStatus(\'' + b.id + '\',\'' + b.status + '\')">' + b.status + '</button>'
+      : '<span class="status-pill ' + statusClass + '">' + b.status + '</span>';
+
+    return '<div class="ticket">' + critStamp +
+      '<span class="ticket-id">' + escapeHtml(b.bug_id) + ' \u00b7 ' + timeAgo(b.created_at) + '</span>' +
+      '<h4>' + escapeHtml(b.summary || 'Untitled') + '</h4>' +
+      '<div class="desc">' + escapeHtml(b.description || 'No description provided.') + '</div>' +
+      '<div class="ticket-tags">' + (b.area ? '<span class="tag tag-area">' + escapeHtml(b.area) + '</span>' : '') + '</div>' +
+      '<div class="ticket-footer"><span>' + escapeHtml(b.reporter || 'anonymous') + '</span>' +
+      sevControl + statusControl + '</div></div>';
   }).join('');
 }
 
 function escapeHtml(str){
   const div = document.createElement('div');
-  div.textContent = str || '';
+  div.textContent = str == null ? '' : str;
   return div.innerHTML;
 }
 
-// handle redirect back from Google OAuth landing on board tab
-window.addEventListener('load', async ()=>{
-  const { data: { session } } = await sb.auth.getSession();
-  if(session){
-    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-    document.querySelector('.nav-tab[data-view="board"]').classList.add('active');
-    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-    document.getElementById('view-board').classList.add('active');
-    checkAuthAndRender();
-  }
-});
+loadSession();
 </script>
 </body>
 </html>
