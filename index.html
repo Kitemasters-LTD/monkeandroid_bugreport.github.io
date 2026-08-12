@@ -75,7 +75,7 @@
   .filter-chip{font-family:'Inter',sans-serif; font-size:12.5px; font-weight:600; color:var(--text-dim); background:var(--ink-soft); border:1px solid var(--line); padding:7px 14px; border-radius:20px; cursor:pointer; transition:all .15s ease;}
   .filter-chip.active{background:var(--paper); color:var(--ink); border-color:var(--paper);}
 
-  .board-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:16px;}
+  .board-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:16px; align-items:start;}
   .ticket{background:var(--paper); color:var(--ink); border-radius:13px; padding:20px; position:relative; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.25);}
   .ticket-id{font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; color:#8a8983; letter-spacing:0.04em; margin-bottom:8px; display:block;}
   .ticket h4{font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:700; margin-bottom:8px; line-height:1.3;}
@@ -302,6 +302,7 @@ let bugs = [];
 let currentFilter = 'All';
 let selectedSeverity = 'Medium';
 let session = null;
+let isAdmin = false;
 
 function providerOf(user){
   return (user && user.app_metadata && user.app_metadata.provider) || '';
@@ -314,10 +315,10 @@ function avatarOf(user){
   const m = (user && user.user_metadata) || {};
   return m.avatar_url || m.picture || '';
 }
-// Reviewer privileges are surfaced for Google sign-ins; the database policy is
-// what actually enforces who may edit.
+// Admin status is decided by the server (the is_admin() SQL function checks the
+// signed-in user's email + provider). The admin email never appears in this file.
 function canEdit(){
-  return session && providerOf(session.user) === 'google';
+  return isAdmin === true;
 }
 
 // ---------- nav ----------
@@ -353,6 +354,7 @@ document.getElementById('googleSignIn').addEventListener('click', async ()=>{
 async function doSignOut(){
   await sb.auth.signOut();
   session = null;
+  isAdmin = false;
   refreshAuthUI();
 }
 document.getElementById('formSignOut').addEventListener('click', doSignOut);
@@ -382,7 +384,7 @@ function refreshAuthUI(){
   document.getElementById('boardContent').style.display = signedIn ? 'block' : 'none';
   if(signedIn){
     document.getElementById('boardWho').textContent = displayNameOf(user);
-    document.getElementById('boardProvider').textContent = providerOf(user);
+    document.getElementById('boardProvider').textContent = isAdmin ? 'admin' : 'viewer';
     const av = avatarOf(user);
     const avEl = document.getElementById('boardAvatar');
     if(av){ avEl.src = av; avEl.style.display = 'block'; } else { avEl.style.display = 'none'; }
@@ -391,12 +393,23 @@ function refreshAuthUI(){
   }
 }
 
-async function loadSession(){
+async function refreshSession(){
   const { data } = await sb.auth.getSession();
   session = data.session || null;
+  if(session){
+    try{
+      const { data: adminData } = await sb.rpc('is_admin');
+      isAdmin = adminData === true;
+    }catch(e){
+      isAdmin = false;
+    }
+  } else {
+    isAdmin = false;
+  }
   refreshAuthUI();
 }
-sb.auth.onAuthStateChange((_e, s)=>{ session = s; refreshAuthUI(); });
+async function loadSession(){ await refreshSession(); }
+sb.auth.onAuthStateChange(()=>{ refreshSession(); });
 
 // ---------- submit ----------
 document.getElementById('bugForm').addEventListener('submit', async (e)=>{
