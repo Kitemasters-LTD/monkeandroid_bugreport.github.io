@@ -240,9 +240,10 @@
 
 <script>
 // ====== CONFIG — fill these in from your Supabase project settings ======
-const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_PUBLIC_KEY';
-const ADMIN_EMAIL = 'playerhasbeentoastedby@gmail.com';
+const SUPABASE_URL = 'https://uoiyzbcsrdsniysovixf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_mUk967AJmmBthUm08TC6Kw_JAu7Gmzo';
+// Admin authorization is enforced entirely by the Supabase RLS policy on the
+// "bugs" table — no admin email is stored in this file.
 // ==========================================================================
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -341,21 +342,18 @@ function showGate(deniedReason){
 function showBoard(user){
   document.getElementById('gate').style.display = 'none';
   document.getElementById('boardContent').style.display = 'block';
-  document.getElementById('adminEmail').textContent = user.email;
+  document.getElementById('adminEmail').textContent = 'Signed in';
   renderBoard();
 }
 
 async function checkAuthAndRender(){
   const { data: { session } } = await sb.auth.getSession();
   if(session && session.user){
-    if(session.user.email === ADMIN_EMAIL){
-      currentUser = session.user;
-      showBoard(currentUser);
-    } else {
-      // signed in but wrong account
-      await sb.auth.signOut();
-      showGate(true);
-    }
+    currentUser = session.user;
+    // Don't gate on email client-side — the Supabase RLS policy is the real
+    // authorization check. If this account isn't the admin, renderBoard()'s
+    // select/update calls will simply return no rows or fail silently.
+    showBoard(currentUser);
   } else {
     showGate();
   }
